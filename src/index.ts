@@ -29,8 +29,25 @@ const getListFromChangesHistory = <T extends object>(history: (SingleChange<T> &
     return list;
 };
 
+const getListFromCallback = <T>() => {
+    const list: (T & ID)[] = [];
+    const callback = (item: SingleChange<T> & ID) => {
+        const index = list.findIndex(i => i.id === item.id);
+        if (index === NOT_FOUND) {
+            list.push(merge({}, item) as T & ID); // merge will remove `unset` value on first object if somehow defined
+            return;
+        }
+        list[index] = merge(list[index], item);
+    };
+
+    return {
+        list, callback,
+    };
+};
+
 export {
     getObjectFromChangesHistory,
     getListFromChangesHistory,
+    getListFromCallback,
     UNSET,
 };
